@@ -12,24 +12,20 @@ import { fetchSync } from "https://raw.esm.sh/gh/jeff-hykin/sync_fetch@v1.0.0/ma
 const { ok, status, headers, text } = fetchSync("https://example.com")
 ```
 
-Or run your own async code synchronously — make a worker module:
-
-```js
-// my_worker.js
-import { serveSync } from "https://raw.esm.sh/gh/jeff-hykin/sync_fetch@v1.0.0/worker.js"
-
-serveSync(async (payload) => {
-    // any async work; return value must be JSON-serializable
-    return await somethingAsync(payload)
-})
-```
-
-and call into it:
+Or run your own async code synchronously with an inline worker:
 
 ```js
 import { createSyncCaller } from "https://raw.esm.sh/gh/jeff-hykin/sync_fetch@v1.0.0/main.js"
 
-const callSync = createSyncCaller(new URL("./my_worker.js", import.meta.url))
+const workerCode = `
+    import { serveSync } from "https://raw.esm.sh/gh/jeff-hykin/sync_fetch@v1.0.0/worker.js"
+
+    serveSync(async (payload) => {
+        // any async work; return value must be JSON-serializable
+        return await somethingAsync(payload)
+    })
+`
+const callSync = createSyncCaller(URL.createObjectURL(new Blob([workerCode], { type: "application/javascript" })))
 const result = callSync({ some: "payload" }) // blocks until the handler resolves
 ```
 
