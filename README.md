@@ -1,13 +1,8 @@
 # sync_fetch
 
-Synchronous `fetch` (and synchronous calls into any async code) for Deno.
+Synchronous `fetch`, cause sometimes its needed.
 
-There is no sync HTTP API in Deno/JS — `fetch` is promise-only and sync XHR
-never existed outside browsers. But sometimes you're in a spot that *cannot*
-await: a synchronous interpreter mid-expression, a callback API that expects a
-plain return value, etc. This library blocks the calling thread with
-`Atomics.wait` while a Web Worker thread does the async work, then hands the
-result back through a growable `SharedArrayBuffer`.
+Implemented with web workers and `Atomics.wait` and a `SharedArrayBuffer`.
 
 ## Usage
 
